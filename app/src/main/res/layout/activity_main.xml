@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: Refactor layout to use data binding library -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.MainActivity">
+
+    <!-- TODO: Include a RecyclerView -->
+
+    <!-- TODO: Include a TextView as empty view
+         TODO: Create a drawable for drawableTop -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
