@@ -13,4 +13,6 @@
     <!-- TODO: Include a TextView as empty view
          TODO: Create a drawable for drawableTop -->
 
+    <!-- TODO: Create layout for RecyclerView Item (in another file) -->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
