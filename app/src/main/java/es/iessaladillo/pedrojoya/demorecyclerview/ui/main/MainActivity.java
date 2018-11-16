@@ -2,14 +2,16 @@ package es.iessaladillo.pedrojoya.demorecyclerview.ui.main;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
-import java.util.List;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import es.iessaladillo.pedrojoya.demorecyclerview.R;
 import es.iessaladillo.pedrojoya.demorecyclerview.data.local.Database;
 import es.iessaladillo.pedrojoya.demorecyclerview.data.local.model.Student;
@@ -25,17 +27,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         b = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(new Database())).get
-            (MainActivityViewModel.class);
-
-        // TODO: Give viewModel to binding.
-        // TODO: Give lifecycle to binding.
-
+        viewModel = ViewModelProviders.of(this, new MainActivityViewModelFactory(new Database()))
+            .get(MainActivityViewModel.class);
         setupViews();
-
-        List<Student> students = viewModel.getStudents(false);
-        listAdapter.submitList(students);
-        b.lblEmptyView.setVisibility(students.size() == 0 ? View.VISIBLE: View.INVISIBLE);
+        observeStudents();
     }
 
     private void setupViews() {
@@ -43,20 +38,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        listAdapter = new MainActivityAdapter(position -> deleteStudent(listAdapter.getItem(position)));
-        // TODO: Set listeners of adapter.
+        listAdapter = new MainActivityAdapter(
+            position -> showStudent(listAdapter.getItem(position)));
         b.lstStudents.setHasFixedSize(true);
         b.lstStudents.setLayoutManager(new GridLayoutManager(this,
             getResources().getInteger(R.integer.main_lstSudents_columns)));
         b.lstStudents.setItemAnimator(new DefaultItemAnimator());
         b.lstStudents.setAdapter(listAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback
+            (0, ItemTouchHelper.START | ItemTouchHelper.END) {
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                @NonNull RecyclerView.ViewHolder viewHolder,
+                @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                viewModel.deleteStudent(listAdapter.getItem(viewHolder.getAdapterPosition()));
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(b.lstStudents);
     }
 
-    private void deleteStudent(Student student) {
-        viewModel.deleteStudent(student);
-        List<Student> students = viewModel.getStudents(true);
-        listAdapter.submitList(students);
-        b.lblEmptyView.setVisibility(students.size() == 0 ? View.VISIBLE: View.INVISIBLE);
+    private void observeStudents() {
+        viewModel.getStudents().observe(this, students -> {
+            listAdapter.submitList(students);
+            b.lblEmptyView.setVisibility(students.size() == 0 ? View.VISIBLE : View.INVISIBLE);
+        });
+    }
+
+    private void showStudent(Student student) {
+        Toast.makeText(this, student.getName(), Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -4,8 +4,8 @@ package es.iessaladillo.pedrojoya.demorecyclerview.data.local.model;
 public class Student {
 
     private long id;
-    private String name;
-    private int age;
+    private final String name;
+    private final int age;
 
     public Student(long id, String name, int age) {
         this.id = id;
@@ -17,6 +17,7 @@ public class Student {
         return id;
     }
 
+    @SuppressWarnings("unused")
     public void setId(long id) {
         this.id = id;
     }
@@ -25,16 +26,8 @@ public class Student {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
 }

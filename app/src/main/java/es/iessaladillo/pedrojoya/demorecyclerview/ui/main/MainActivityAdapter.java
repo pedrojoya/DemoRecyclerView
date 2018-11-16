@@ -1,25 +1,36 @@
 package es.iessaladillo.pedrojoya.demorecyclerview.ui.main;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import es.iessaladillo.pedrojoya.demorecyclerview.R;
 import es.iessaladillo.pedrojoya.demorecyclerview.data.local.model.Student;
 
-public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapter.ViewHolder> {
+public class MainActivityAdapter extends ListAdapter<Student, MainActivityAdapter.ViewHolder> {
 
-    private List<Student> data = new ArrayList<>();
     private final OnStudentClickListener onStudentClickListener;
 
     public MainActivityAdapter(OnStudentClickListener onStudentClickListener) {
+        super(new DiffUtil.ItemCallback<Student>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Student oldItem, @NonNull Student newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Student oldItem, @NonNull Student newItem) {
+                return TextUtils.equals(oldItem.getName(), newItem.getName()) &&
+                    oldItem.getAge() == newItem.getAge();
+            }
+        });
         this.onStudentClickListener = onStudentClickListener;
     }
 
@@ -33,26 +44,17 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(data.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return data == null ? 0 : data.size();
+        holder.bind(getItem(position));
     }
 
     @Override
     public long getItemId(int position) {
-        return data.get(position).getId();
+        return getItem(position).getId();
     }
 
+    @Override
     public Student getItem(int position) {
-        return data.get(position);
-    }
-
-    public void submitList(@NonNull List<Student> newData) {
-        data = newData;
-        notifyDataSetChanged();
+        return super.getItem(position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -60,20 +62,18 @@ public class MainActivityAdapter extends RecyclerView.Adapter<MainActivityAdapte
         private final TextView lblName;
         private final TextView lblAge;
 
-        public ViewHolder(View itemView, OnStudentClickListener onStudentClickListener) {
+        ViewHolder(View itemView, OnStudentClickListener onStudentClickListener) {
             super(itemView);
             lblName = ViewCompat.requireViewById(itemView, R.id.lblName);
             lblAge = ViewCompat.requireViewById(itemView, R.id.lblAge);
             itemView.setOnClickListener(v -> onStudentClickListener.onItemClick(getAdapterPosition()));
         }
 
-        public void bind(Student student) {
+        void bind(Student student) {
             lblName.setText(student.getName());
             lblAge.setText(String.valueOf(student.getAge()));
         }
-    }
 
-    // TODO: Define interfaces to communicate to Activity
-    // TODO: Define listeners and setters.
+    }
 
 }
